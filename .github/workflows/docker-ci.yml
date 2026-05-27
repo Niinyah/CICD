@@ -17,18 +17,18 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Build Docker image
-        run: docker build -t app:test .
+        run: docker build -t test .
 
       - name: Run Docker container
         run: |
           # Run the container in detached mode
-          docker compose up -d
+          docker run -d --name test-container -p 8080:8080 test
           
           # Wait for a few seconds to ensure the container is up and running
-          sleep 20
+          sleep 30
 
           # Test the application endpoint
-          curl -f http://localhost:8090/actuator/health || exit 1
-
-          # Stop and remove the container
-          docker compose down
+          curl -f http://localhost:8080/actuator/health || exit 1
+        
+          docker stop test
+          docker rm test
